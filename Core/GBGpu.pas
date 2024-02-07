@@ -9,13 +9,11 @@ type
   Mode = (HBLANK, VBLANK, OAM_ACCESS, VRAM_ACCESS);
 
 type
-  PScreenArr = ^TScreenArry;
-
-  TScreenArry = array[0..23039] of Integer;
+  TScreenArray = array[0..23039] of Integer;
 
   PScanlineRow = ^TScanlineRow;
 
-  TDrawCallback = reference to procedure(const Value: PScreenArr);
+  TDrawCallback = reference to procedure(const Value: TScreenArray);
 
   TScanlineRow = array[0..159] of Integer;
 
@@ -56,9 +54,9 @@ type
     LcdControl_lcdEnable, LcdControl_wndTileMapDisplaySelect, LcdControl_wndDisplayEnable, LcdControl_bgAndWndTileDataSelect, LcdControl_bgTileMapDisplaySelect, LcdControl_tallSpriteMode, LcdControl_spriteDisplayEnable, LcdControl_bgWndDisplayPriority: Boolean;
     function LcdControl_getSpriteSize(): Integer;
 
-    procedure renderScanLine();
+    procedure RenderScanLine();
     procedure renderBackground(pscanlineRow: PScanlineRow);
-    procedure renderSprites(pscanlineRow: PScanlineRow);
+    procedure RenderSprites(pscanlineRow: PScanlineRow);
 
   public
     modeClock: Integer; //临时放开
@@ -68,8 +66,7 @@ type
     scrollX, scrollY: Integer;
     vram: array[0..$2000 - 1] of Integer;
     tileset: array[0..383, 0..7, 0..7] of Integer;
-    screen: TScreenArry; //array[0..23039] of Integer;
-    pscreen: PScreenArr;
+    screen: TScreenArray; //array[0..23039] of Integer;
     backgroundPalette: array[0..3] of Integer;
     spritePalette: array[0..1, 0..3] of Integer;
     palette: array[0..3] of Integer;
@@ -78,7 +75,7 @@ type
     pspriteList: PGBSprites;
     FDrawCallback: TDrawCallback;
 
-    procedure step(cycle: Integer);
+    procedure Step(Cycle: Integer);
 
     function LcdStatus_getLcdStatus(): Integer;
     procedure LcdStatus_setLcdStatus(value: Integer);
@@ -190,8 +187,6 @@ begin
   modeClock := 0;
   currentMode := Mode.VRAM_ACCESS;
   lcdControl_setLcdControl($91);
-
-  pscreen := @screen;
 
 //  wjlGBColor[0] := 255 Shl 16 or 255  shl 8 or 255;//OFF
 //  wjlGBColor[1] := 192 Shl 16 or 192  shl 8 or 192;//LIGHT
@@ -431,26 +426,21 @@ begin
   end;
 end;
 
-procedure TGBGpu.renderScanLine;
+procedure TGBGpu.RenderScanLine;
 var
   scanlineRow: TScanlineRow;
-  _pscanlineRow: pscanlineRow;
 begin
-// 测试，初始化全为0
   FillChar(scanlineRow, SizeOf(scanlineRow), 0);
-  _pscanlineRow := @scanlineRow;
-
   if LcdControl_bgWndDisplayPriority then
-    renderBackground(_pscanlineRow);
+    renderBackground(@scanlineRow);
   if LcdControl_spriteDisplayEnable then
-    renderSprites(_pscanlineRow);
+    RenderSprites(@scanlineRow);
 end;
 
-procedure TGBGpu.renderSprites(pscanlineRow: pscanlineRow);
+procedure TGBGpu.RenderSprites(pscanlineRow: pscanlineRow);
 var
   spriteSize, canvasoffs: Integer;
   I: Integer;
-//  obj: Sprite;
   pal: array[0..3] of Integer;
   J: Integer;
   tilerow: array[0..7] of Integer;
@@ -533,9 +523,9 @@ begin
   end;
 end;
 
-procedure TGBGpu.step(cycle: Integer);
+procedure TGBGpu.Step(Cycle: Integer);
 begin
-  modeClock := modeClock + cycle;
+  modeClock := modeClock + Cycle;
   case currentMode of
     OAM_ACCESS:
       begin
@@ -551,7 +541,7 @@ begin
         begin
           currentMode := Mode.HBLANK;
           modeClock := 0;
-          renderScanLine();
+          RenderScanLine();
         end;
       end;
     HBLANK:
@@ -565,7 +555,7 @@ begin
             currentMode := Mode.VBLANK;
             GBInterrupt.Instance.raiseInterruptByIdx(4); // VBLANK
           // 显示器渲染screen
-            FDrawCallback(pscreen);
+            FDrawCallback(screen);
           end
           else
           begin

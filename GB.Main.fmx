@@ -13,6 +13,7 @@ object FormMain: TFormMain
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
   DesignerMasterStyle = 0
@@ -221,9 +222,15 @@ object FormMain: TFormMain
         Size.PlatformDefault = False
         TabOrder = 1
         object LabelFPS: TLabel
+          StyledSettings = []
+          Opacity = 0.299999982118606600
           Position.X = 32.000000000000000000
-          Position.Y = 8.000000000000000000
-          Text = 'LabelFPS'
+          Position.Y = 12.000000000000000000
+          TextSettings.Font.Family = 'Roboto'
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          TextSettings.FontColor = xFF909090
+          Text = 'FPS'
           TabOrder = 2
         end
         object Layout2: TLayout
@@ -244,6 +251,20 @@ object FormMain: TFormMain
             Stroke.Kind = None
             XRadius = 4.000000000000000000
             YRadius = 4.000000000000000000
+            object Label11: TLabel
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Position.X = 7.000000000000000000
+              Position.Y = 6.000000000000000000
+              Size.Width = 16.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'A'
+              TabOrder = 2
+            end
           end
           object Rectangle5: TRectangle
             Align = HorzCenter
@@ -265,6 +286,48 @@ object FormMain: TFormMain
               Size.PlatformDefault = False
               Stroke.Color = xFF1A1A1A
             end
+            object Label9: TLabel
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Position.X = 7.000000000000000000
+              Position.Y = 7.000000000000000000
+              Size.Width = 16.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'W'
+              TabOrder = 3
+            end
+            object Label10: TLabel
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Position.X = 34.000000000000000000
+              Position.Y = 36.000000000000000000
+              Size.Width = 18.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'D'
+              TabOrder = 2
+            end
+            object Label12: TLabel
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Position.X = 6.000000000000000000
+              Position.Y = 65.000000000000000000
+              Size.Width = 18.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'S'
+              TabOrder = 1
+            end
           end
         end
         object Layout3: TLayout
@@ -283,6 +346,19 @@ object FormMain: TFormMain
             Size.Height = 50.000000000000000000
             Size.PlatformDefault = False
             Stroke.Color = xFF620A35
+            object Label13: TLabel
+              Align = Center
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Size.Width = 16.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'J'
+              TabOrder = 3
+            end
           end
           object Circle3: TCircle
             Fill.Color = xFF860E48
@@ -292,6 +368,19 @@ object FormMain: TFormMain
             Size.Height = 50.000000000000000000
             Size.PlatformDefault = False
             Stroke.Color = xFF620A35
+            object Label14: TLabel
+              Align = Center
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Size.Width = 16.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'K'
+              TabOrder = 3
+            end
           end
           object Layout4: TLayout
             Position.X = 36.000000000000000000
@@ -365,6 +454,19 @@ object FormMain: TFormMain
               Text = 'SELECT'
               TabOrder = 0
             end
+            object Label15: TLabel
+              Align = Center
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Size.Width = 16.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'C'
+              TabOrder = 3
+            end
           end
           object Rectangle7: TRectangle
             Fill.Color = xFF77767C
@@ -392,6 +494,19 @@ object FormMain: TFormMain
               TextSettings.WordWrap = False
               Text = 'START'
               TabOrder = 0
+            end
+            object Label16: TLabel
+              Align = Center
+              StyledSettings = [Family, Size, Style]
+              Opacity = 0.300000011920929000
+              Size.Width = 16.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.FontColor = claWhite
+              TextSettings.HorzAlign = Center
+              TextSettings.WordWrap = False
+              Text = 'X'
+              TabOrder = 3
             end
           end
         end
@@ -434,6 +549,34 @@ object FormMain: TFormMain
             end
           end
         end
+        object RectangleOFF: TRectangle
+          Fill.Color = xFF941C1C
+          Position.X = 360.000000000000000000
+          Position.Y = 15.000000000000000000
+          Size.Width = 25.000000000000000000
+          Size.Height = 9.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 4.000000000000000000
+          YRadius = 4.000000000000000000
+          OnClick = RectangleOFFClick
+          object Label17: TLabel
+            Align = Left
+            AutoSize = True
+            StyledSettings = [Size]
+            Margins.Left = -30.000000000000000000
+            Position.X = -30.000000000000000000
+            Size.Width = 22.000000000000000000
+            Size.Height = 9.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Roboto'
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = xFF3D3384
+            TextSettings.WordWrap = False
+            Text = 'OFF'
+            TabOrder = 0
+          end
+        end
       end
     end
     object ShadowEffect: TShadowEffect
@@ -444,5 +587,11 @@ object FormMain: TFormMain
       ShadowColor = claBlack
       Enabled = False
     end
+  end
+  object OpenDialogROM: TOpenDialog
+    Filter = 'GameBoy roms (*.gb)|*.gb'
+    Options = [ofReadOnly, ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Left = 288
+    Top = 416
   end
 end

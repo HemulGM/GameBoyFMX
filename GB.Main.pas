@@ -6,7 +6,8 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, GBGpu, GBJoypad,
   FMX.Objects, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Memo.Types,
-  FMX.ScrollBox, FMX.Memo, FMX.Layouts, FMX.Effects;
+  FMX.ScrollBox, FMX.Memo, FMX.Layouts, FMX.Effects, GBRom, GBMemory, GBCpu,
+  GBTimer, GBSound, GBMbc;
 
 type
   TFormMain = class(TForm)
@@ -49,6 +50,17 @@ type
     RectangleLoad: TRectangle;
     Label8: TLabel;
     Layout6: TLayout;
+    Label9: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
+    Label15: TLabel;
+    Label16: TLabel;
+    OpenDialogROM: TOpenDialog;
+    RectangleOFF: TRectangle;
+    Label17: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure PaintBoxScreenPaint(Sender: TObject; Canvas: TCanvas);
     procedure TimerFPSTimer(Sender: TObject);
@@ -56,12 +68,22 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure LayoutClientMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure FormDestroy(Sender: TObject);
+    procedure RectangleOFFClick(Sender: TObject);
   private
-    _fps, _fpsTotal: Integer;
-    _bmp: TBitmap;
+    FFPS, FFPSTotal: Integer;
+    FWork: Boolean;
+    FBuffer: TBitmap;
+    FGBROM: TGBRom;
+    FGBMem: TGBMemory;
+    FGBCPU: TGBCpu;
+    FGBGPU: TGBGpu;
+    FGBSound: TGBSound;
+    FGBMBC: TGBMbc;
+    FGBJoyPad: TGBJoypad;
+    procedure LoadROM(const FileName: string);
   public
-    _gbJoyPad: TGBJoypad;
-    procedure drawScreen(const pscreen: PScreenArr);
+    procedure DrawScreen(const ScreenData: TScreenArray);
   end;
 
 var
@@ -69,51 +91,45 @@ var
 
 implementation
 
-uses
-  GBRom, GBMemory, GBCpu, GBTimer, GBSound, GBMbc;
-
 {$R *.fmx}
 
 procedure TFormMain.ButtonLoadClick(Sender: TObject);
+begin
+  if OpenDialogROM.Execute then
+    LoadROM(OpenDialogROM.FileName);
+end;
+
+procedure TFormMain.LoadROM(const FileName: string);
 var
   getStream: TFileStream;
-  getPath: string;
-  rom: TGBRom;
-  mem: TGBMemory;
-  cpu: TGBCpu;
-  gpu: TGBGpu;
-  pgpu: PGBGpu;
-  sound: TGBSound;
-  psound: PGBSound;
-  pmem: PGBMemory;
-  _gbrom: PGBRom;
-  _mbc: TGBMbc;
-  _Pmbc: PGBMbc;
 begin
-  getPath := 'D:\Projects\#Fork\DelphiGBEmu\roms\Super Mario Land (JUE) (V1.1) [!].gb';
-  getPath := 'D:\Projects\GameBoyFMX\roms\Legend of Zelda, The - Link''s Awakening (U) (V1.2) [!].gb';
-  getPath := 'D:\Projects\GameBoyFMX\roms\Mortal Kombat 3 (U) [!].gb';
-  getStream := TFileStream.Create(getPath, fmOpenRead or fmShareExclusive);
-  getStream.Position := 0;
-  rom := TGBRom.Create;
-  rom.readRom(getStream);
-  getStream.Free;
-  gpu := TGBGpu.Create(drawScreen);
-  pgpu := @gpu;
-  _gbrom := @rom;
-  _mbc := TGBMbc.Create(_gbrom);
-  _Pmbc := @_mbc;
-  mem := TGBMemory.Create(_Pmbc, pgpu);
-  pmem := @mem;
-  sound := TGBSound.Create(pmem);
-  psound := @sound;
-  cpu := TGBCpu.Create(pmem, pgpu, psound);
-//  Application.ProcessMessages;
-  cpu.skipBios;
-//  cpu.main;
-//  ShowMessage('done');
+  if Assigned(FGBCPU) then
+  begin
+    if not FGBCPU.Paused then
+    begin
+      FGBCPU.Paused := True;
+      LoadROM(FileName);
+      Exit;
+    end;
+  end;
+  FGBROM := TGBRom.Create;
+  getStream := TFileStream.Create(FileName, fmOpenRead or fmShareExclusive);
+  try
+    getStream.Position := 0;
+    FGBROM.ReadROM(getStream);
+  finally
+    getStream.Free;
+  end;
+  FGBGPU := TGBGpu.Create(DrawScreen);
+  FGBMBC := TGBMbc.Create(@FGBROM);
+  FGBMem := TGBMemory.Create(@FGBMBC, @FGBGPU);
+  FGBSound := TGBSound.Create(@FGBMem);
+  FGBCPU := TGBCpu.Create(@FGBMem, @FGBGPU, @FGBSound);
+  FGBCPU.SkipBios;
+  //  cpu.main;
+  //  ShowMessage('done');
 
- // UP=87,DOWN=83,LEFT=65,RIGHT=68
+  // UP=87,DOWN=83,LEFT=65,RIGHT=68
   TGBJoypad.Instance.GBKeys[TGBKey.UP] := 119;
   TGBJoypad.Instance.GBKeys[TGBKey.DOWN] := 115;
   TGBJoypad.Instance.GBKeys[TGBKey.LEFT] := 97;
@@ -125,40 +141,45 @@ begin
   TGBJoypad.Instance.GBKeys[TGBKey.START] := 120;
   {
   w = 119
-a = 97
-s = 115
-d = 100
-x = 120
-c = 99
-j = 106
-k = 107   }
+  a = 97
+  s = 115
+  d = 100
+  x = 120
+  c = 99
+  j = 106
+  k = 107   }
 
-  while (not cpu.Paused) and (not Application.Terminated) do
-    cpu.step(1);
+  FWork := True;
+  while (not FGBCPU.Paused) and (not Application.Terminated) do
+    FGBCPU.step(1);
+
+  FWork := False;
+  FreeAndNil(FGBROM);
+  FreeAndNil(FGBMem);
+  FreeAndNil(FGBGPU);
+  FreeAndNil(FGBSound);
+  FreeAndNil(FGBMBC);
+  FreeAndNil(FGBCPU);
 end;
 
-procedure TFormMain.drawScreen(const pscreen: PScreenArr);
+procedure TFormMain.DrawScreen(const ScreenData: TScreenArray);
 var
-  x, y: Integer;
-  Line: PRGB32Array;
   Data: TBitmapData;
 begin
-  Inc(_fpsTotal);
+  Inc(FFPSTotal);
   if not TimerFPS.Enabled then
-  begin
     TimerFPS.Enabled := True;
-  end;
   //Label1.Text := IntToStr(_fpsTotal);
-  if _bmp.Map(TMapAccess.Write, Data) then
+  if FBuffer.Map(TMapAccess.Write, Data) then
   try
     with Data do
     begin
-      for y := 0 to 144 - 1 do
+      for var y := 0 to 144 - 1 do
       begin
-        Line := GetScanline(y);
-        for x := 0 to 160 - 1 do
+        var Line: PRGB32Array := GetScanline(y);
+        for var x := 0 to 160 - 1 do
         begin
-          case pscreen^[160 * y + x] of
+          case ScreenData[160 * y + x] of
             0:
               begin//255Ј¬255Ј¬255
                 Line[x].B := 208;
@@ -192,10 +213,8 @@ begin
       end;
     end;
   finally
-    _bmp.Unmap(Data);
+    FBuffer.Unmap(Data);
   end;
-//  Image1.Invalidate;
-  //Image1.Picture.Bitmap := _bmp;
   PaintBoxScreen.Repaint;
   Application.ProcessMessages;
 end;
@@ -204,23 +223,36 @@ procedure TFormMain.FormCreate(Sender: TObject);
 begin
   InnerGlowEffect.Enabled := True;
   ShadowEffect.Enabled := True;
-  _fps := 0;
-  _fpsTotal := 0;
-  _bmp := TBitmap.Create;
-  _bmp.Width := 160;
-  _bmp.Height := 144;
+  FFPS := 0;
+  FFPSTotal := 0;
+  FBuffer := TBitmap.Create;
+  FBuffer.Width := 160;
+  FBuffer.Height := 144;
+  FWork := False;
+
+  FGBROM := nil;
+  FGBMem := nil;
+  FGBCPU := nil;
+  FGBGPU := nil;
+  FGBSound := nil;
+  FGBMBC := nil;
  // KeyPreview := True;
+end;
+
+procedure TFormMain.FormDestroy(Sender: TObject);
+begin
+  //
 end;
 
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
 begin
   //Memo1.Lines.Add(KeyChar + ' = ' + Ord(KeyChar).ToString);
-  _gbJoyPad.Instance.GBKeyDown(Ord(AnsiChar(KeyChar)));
+  FGBJoyPad.Instance.GBKeyDown(Ord(KeyChar));
 end;
 
 procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
 begin
-  _gbJoyPad.Instance.GBKeyUp(Ord(AnsiChar(KeyChar)));
+  FGBJoyPad.Instance.GBKeyUp(Ord(KeyChar));
 end;
 
 procedure TFormMain.LayoutClientMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
@@ -232,16 +264,21 @@ procedure TFormMain.PaintBoxScreenPaint(Sender: TObject; Canvas: TCanvas);
 begin
   Canvas.BeginScene(nil);
   try
-    Canvas.DrawBitmap(_bmp, TRectF.Create(0, 0, _bmp.Width, _bmp.Height), PaintBoxScreen.LocalRect, 1, True);
+    Canvas.DrawBitmap(FBuffer, TRectF.Create(0, 0, FBuffer.Width, FBuffer.Height), PaintBoxScreen.LocalRect, 1, True);
   finally
     Canvas.EndScene;
   end;
 end;
 
+procedure TFormMain.RectangleOFFClick(Sender: TObject);
+begin
+  Application.Terminate;
+end;
+
 procedure TFormMain.TimerFPSTimer(Sender: TObject);
 begin
-  Inc(_fps);
-  LabelFPS.Text := IntToStr(_fpsTotal div _fps);
+  Inc(FFPS);
+  LabelFPS.Text := IntToStr(FFPSTotal div FFPS);
 end;
 
 end.

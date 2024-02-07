@@ -20,23 +20,23 @@ type
 type
   TGBRom = class
   protected
-    romTitle: string; // 存放rom的名字
-    romLocate: string;
-    ramSize: string;
-    romSize: string;
-    cartType: TCartridgeTypes;
-    procedure setTitle();
-    procedure setLocation();
-    procedure setRamSize();
-    procedure setRomSize();
-    procedure setCartridgeType();
+    FTitle: string; // 存放rom的名字
+    FLocate: string;
+    FRAMSize: string;
+    FSize: string;
+    FCartType: TCartridgeTypes;
+    procedure SetTitle;
+    procedure SetLocation;
+    procedure SetRamSize;
+    procedure SetRomSize;
+    procedure SetCartridgeType;
   public
-    romData: array of byte;
-    procedure readRom(data: TFileStream);
-    procedure readBios(biosdata: TFileStream);
-    function getTitle(): string;
-    function getRamSize(): string;
-    function getCartridgeType(): TCartridgeTypes;
+    ROMData: TArray<Byte>;
+    procedure ReadROM(Stream: TStream);
+    procedure ReadBIOS(Stream: TStream);
+    function GetTitle: string;
+    function GetRamSize: string;
+    function GetCartridgeType: TCartridgeTypes;
   end;
 
 type
@@ -46,50 +46,46 @@ implementation
 
 { TGBRom }
 
-function TGBRom.getCartridgeType: TCartridgeTypes;
+function TGBRom.GetCartridgeType: TCartridgeTypes;
 begin
-  Result := cartType;
+  Result := FCartType;
 end;
 
-function TGBRom.getRamSize: string;
+function TGBRom.GetRamSize: string;
 begin
-  Result := ramSize;
+  Result := FRAMSize;
 end;
 
-function TGBRom.getTitle: string;
+function TGBRom.GetTitle: string;
 begin
-  Result := romTitle;
+  Result := FTitle;
 end;
 
-procedure TGBRom.readBios(biosdata: TFileStream);
+procedure TGBRom.ReadBIOS(Stream: TStream);
 begin
-  if SizeOf(romData) > 0 then
+  if SizeOf(ROMData) > 0 then
   begin
 
   end;
 end;
 
-procedure TGBRom.readRom(data: TFileStream);
-var
-  I: Integer;
+procedure TGBRom.ReadROM(Stream: TStream);
 begin
-  data.Position := 0;
-  SetLength(romData, data.Size);
-  for I := 0 to data.Size - 1 do
-  begin
-    data.ReadBuffer(romData[I], 1);
-  end;
-  setTitle;
-  setRamSize;
-  setCartridgeType;
+  Stream.Position := 0;
+  SetLength(ROMData, Stream.Size);
+  for var i := 0 to Stream.Size - 1 do
+    Stream.ReadBuffer(ROMData[i], 1);
+  SetTitle;
+  SetRamSize;
+  SetCartridgeType;
 end;
 
-procedure TGBRom.setCartridgeType;
+procedure TGBRom.SetCartridgeType;
 begin
-  case romData[$147] of
+  case ROMData[$147] of
     $00:
       begin
-        with cartType do
+        with FCartType do
         begin
           id := $00;
           name := 'ROM Only';
@@ -98,7 +94,7 @@ begin
       end;
     $01:
       begin
-        with cartType do
+        with FCartType do
         begin
           id := $01;
           name := 'MBC1';
@@ -107,7 +103,7 @@ begin
       end;
     $02:
       begin
-        with cartType do
+        with FCartType do
         begin
           id := $02;
           name := 'MBC1 + RAM';
@@ -116,7 +112,7 @@ begin
       end;
     $03:
       begin
-        with cartType do
+        with FCartType do
         begin
           id := $03;
           name := 'MBC1 + RAM + Battery';
@@ -198,47 +194,35 @@ begin
   end;
 end;
 
-procedure TGBRom.setLocation;
+procedure TGBRom.SetLocation;
 begin
 
 end;
 
-procedure TGBRom.setRamSize;
+procedure TGBRom.SetRamSize;
 begin
 // ADDRESS_RAM_SIZE
-  case romData[$149] of
+  case ROMData[$149] of
     0:
-      begin
-        ramSize := 'None';
-      end;
+      FRAMSize := 'None';
     1:
-      begin
-        ramSize := '2KB';
-      end;
+      FRAMSize := '2KB';
     2:
-      begin
-        ramSize := '8KB';
-      end;
+      FRAMSize := '8KB';
     3:
-      begin
-        ramSize := '32KB';
-      end;
+      FRAMSize := '32KB';
     4:
-      begin
-        ramSize := '128KB';
-      end;
+      FRAMSize := '128KB';
     5:
-      begin
-        ramSize := '64KB';
-      end;
+      FRAMSize := '64KB';
   else
-    ramSize := 'None';
+    FRAMSize := 'None';
   end;
 end;
 
-procedure TGBRom.setRomSize;
+procedure TGBRom.SetRomSize;
 begin
-  case romData[$148] of
+  case ROMData[$148] of
     2:
       begin
 
@@ -267,19 +251,15 @@ begin
 //        Rom8MB  (0x08, 512);
 end;
 
-procedure TGBRom.setTitle;
-var
-  I: Integer;
-  s: string;
+procedure TGBRom.SetTitle;
 begin
-  s := '';
-  for I := $134 to $143 do
+  FTitle := '';
+  for var I := $134 to $143 do
   begin
-    if romData[I] = 0 then
-      continue;
-    s := s + Char(romData[I]);
+    if ROMData[I] = 0 then
+      Continue;
+    FTitle := FTitle + Char(ROMData[I]);
   end;
-  romTitle := s;
 end;
 
 end.

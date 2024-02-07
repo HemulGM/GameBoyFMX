@@ -44,7 +44,7 @@ function TGBMbc.MbcRead(address: Integer): Integer;
 var
   effectiveAddress: Integer;
 begin
-  case _pgbrom^.getCartridgeType.id of
+  case _pgbrom^.GetCartridgeType.id of
     $00:
       begin// ROM_ONLY
         Result := _pgbrom^.romData[address];
@@ -88,7 +88,7 @@ procedure TGBMbc.MbcWrite(address, value: Integer);
 var
   effectiveAddress: Integer;
 begin
-  case _pgbrom^.getCartridgeType.id of
+  case _pgbrom^.GetCartridgeType.id of
     $00:
       begin// ROM_ONLY
       // not support write to rom.

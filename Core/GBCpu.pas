@@ -7,78 +7,71 @@ uses
   GBSound;
 
 type
-  {TGBGpuNew = class
-
-  end;
-  PGBGpuNew = ^TGBGpuNew;      }
   TGBCpu = class
   private
-    // GB CPU lr35902 的寄存器
-    // 前8位是A，后8位是F，分开可读，同时用叫AF寄存器
+    // GB CPU lr35902
     Reg_A: Byte;
     Reg_F: Byte;
-    // 前8位是B，后8位是C，分开可读，同时用叫BC寄存器
+    //
     Reg_B: Byte;
     Reg_C: Byte;
-    // 前8位是D，后8位是E，分开可读，同时用叫DE寄存器
+    //
     Reg_D: Byte;
     Reg_E: Byte;
-    // 前8位是H，后8位是L，分开可读，同时用叫HL寄存器
+    //
     Reg_H: Byte;
     Reg_L: Byte;
 
-    // cpu halt标识
+    // cpu halt
     isHalted: Boolean; // = False;
 
-    // 中断标识
     pendingInterruptEnable: Boolean;
-    // 从内存管理器中获取opcode
-    function getOpcode(): Integer;
+    function GetOpcode: Integer;
     // decode opcode
-    procedure deCode(opcode: Integer);
+    procedure Decode(OpCode: Integer);
 
     // 将dec指令归类放同一个
-    procedure dec_opcode(opcode: Byte);
-    procedure jrcc_opcode(opcode: Byte);
-    procedure daa_opcode(opcode: Byte);
+    procedure DecOpCode(OpCode: Byte);
+    procedure JRCC_OpCode(opcode: Byte);
+    procedure DAA_OpCode(opcode: Byte);
 
-    procedure add16_opcode(opcode: Byte);
-    procedure add_opcode(opcode: Byte);
-    procedure adc_opcode(opcode: Byte);
+    procedure Add16_OpCode(opcode: Byte);
+    procedure Add_OpCode(opcode: Byte);
+    procedure Adc_OpCode(opcode: Byte);
     procedure sub_opcode(opcode: Byte);
-    procedure sbc_opcode(opcode: Byte);
+    procedure SBCOpCode(opcode: Byte);
     procedure and_opcode(opcode: Byte);
     procedure xor_opcode(opcode: Byte);
     procedure or_opcode(opcode: Byte);
     procedure load_opcode(opcode: Byte);
     procedure cp_opcode(opcode: Byte);
-    procedure retcc_opcode(opcode: Byte);
+    procedure RetCCOpCode(OpCode: Byte);
     procedure jpcc_opcpode(opcode: Byte);
     procedure callcc_opcode(opcode: Byte);
-    procedure rst_opcode(opcode: Byte);
+    procedure RSTOpCode(Value: Byte);
     //重写部分opcode的处理过程
     procedure inc16_opcode(opcode: Byte);
     procedure dec16_opcode(opcode: Byte);
     procedure inc_opcode(opcode: Byte);
     procedure jmp_opcode(opcode: Byte);
 
-    function popHelper(): Integer;
-    procedure pushHelper(value: Integer);
-    procedure retHelper();
+    function PopHelper(): Integer;
+    procedure PushHelper(Value: Integer);
+    procedure RetHelper();
     function swapHelper(value: Integer): Integer;
     function cbHelperRead(opcode: Integer): Integer;
     procedure cbHelperWrite(opcode, value: Integer);
     // PreFix CB部分的opcode，都是类似$CB00，所以要用Word类型
-    procedure rlc_opcode(opcode: Word);
-    procedure rrc_opcode(opcode: Word);
-    procedure rl_opcode(opcode: Word);
-    procedure rr_opcode(opcode: Word);
+    procedure RLCOpCode(opcode: Word);
+    procedure RRCOpCode(OpCode: Word);
+    procedure RLOpCode(opcode: Word);
+    procedure RROpCode(OpCode: Word);
     procedure sla_opcode(opcode: Word);
     procedure sra_opcode(opcode: Word);
     procedure swap_opcode(opcode: Word);
     procedure srl_opcode(opcode: Word);
     procedure bit_opcode(opcode: Word);
-    procedure res_opcode(opcode: Word);
+    procedure ResOpCode(opcode: Word);
     procedure set_opcode(opcode: Word);
 
     // 处理
@@ -128,7 +121,7 @@ type
     function getReg_DE(): Word;
     function getReg_H(): Byte;
     function getReg_L(): Byte;
-    function getReg_HL(): Word;
+    function GetRegHL(): Word;
     function getReg_SP_Low(): Byte;
     function getReg_SP_High(): Byte;
     // 寄存器赋值
@@ -148,7 +141,7 @@ type
     //寄存器SP和PC的INC要手动处理
 
     procedure pop_opcode(opcode: Integer);
-    procedure push_opcode(opcode: Integer);
+    procedure PushOpCode(OpCode: Integer);
 
     constructor Create(pgbMemory: PGBMemory; pgbGpu: PGBGpu; pgbSound: PGBSound); overload;
     //Constructor Create(pgbMemory: PGBMemory;pgbGpu: PGBGpuNew; pgbSound: PGBSound); overload;
@@ -167,7 +160,7 @@ type
     procedure consumeClockCycles(cycles: Integer);
 
     procedure step(i: Integer);
-    procedure skipBios();
+    procedure SkipBios();
     procedure main();
 
   end;
@@ -176,7 +169,7 @@ implementation
 
 { TGBCpu }
 
-procedure TGBCpu.adc_opcode(opcode: Byte);
+procedure TGBCpu.Adc_OpCode(opcode: Byte);
 var
   second, oldval, result: Integer;
 begin
@@ -218,7 +211,7 @@ begin
       end;
     $8E:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $CE:
@@ -258,7 +251,7 @@ begin
     consumeClockCycles(4);
 end;
 
-procedure TGBCpu.add16_opcode(opcode: Byte);
+procedure TGBCpu.Add16_OpCode(opcode: Byte);
 var
   value, result, hl, resultXor: Integer;
 begin
@@ -276,7 +269,7 @@ begin
       end;
     $29:
       begin
-        value := getReg_HL;
+        value := GetRegHL;
 //      consumeClockCycles(8);
       end;
     $39:
@@ -293,7 +286,7 @@ begin
 //      consumeClockCycles(16);
       end;
   end;
-  hl := getReg_HL;
+  hl := GetRegHL;
   if opcode = $E8 then
   begin
     result := value + Reg_SP;
@@ -337,7 +330,7 @@ begin
   end;
 end;
 
-procedure TGBCpu.add_opcode(opcode: Byte);
+procedure TGBCpu.Add_OpCode(opcode: Byte);
 var
   second, oldval, result: Integer;
 begin
@@ -379,7 +372,7 @@ begin
       end;
     $86:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $C6:
@@ -459,7 +452,7 @@ begin
       end;
     $A6:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $E6:
@@ -531,7 +524,7 @@ begin
   end
   else
   begin
-    pushHelper(Reg_PC);
+    PushHelper(Reg_PC);
     temp := temp shl 8;
     address := address or temp;
     Reg_PC := address;
@@ -582,7 +575,7 @@ begin
       end;
     $06, $0E:
       begin
-        ret := _PGBMem^.ReadGBMemory(getReg_HL);
+        ret := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(16);
       end;
   end;
@@ -629,7 +622,7 @@ begin
       end;
     $6, $E:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, value);
+        _PGBMem^.WriteGBMemory(GetRegHL, value);
         consumeClockCycles(16);
       end;
   end;
@@ -650,7 +643,7 @@ begin
    // _pGBGpuNew.updateLCDStatus(cycles)
 
   else
-    _pGBGpu^.step(cycles);
+    _pGBGpu^.Step(cycles);
 
 //// 处理声音
 //  if (_pGBSound^._debug_i>0) and (_pGBSound^._debug_i<144) then
@@ -716,7 +709,7 @@ begin
       end;
     $be:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $fe:
@@ -792,7 +785,7 @@ begin
   _icycle_count := 0;
 end;
 
-procedure TGBCpu.daa_opcode(opcode: Byte);
+procedure TGBCpu.DAA_OpCode(opcode: Byte);
 var
   op: Integer;
 begin
@@ -837,11 +830,11 @@ begin
 
 end;
 
-procedure TGBCpu.deCode(opcode: Integer);
+procedure TGBCpu.Decode(OpCode: Integer);
 var
   tmp, value: Integer;
 begin
-  case opcode of
+  case OpCode of
     $00:
       begin// NOP
         consumeClockCycles(4);
@@ -878,7 +871,7 @@ begin
       end;
     $23:
       begin// INC HL
-        setReg_HL(getReg_HL() + 1);
+        setReg_HL(GetRegHL() + 1);
         consumeClockCycles(8);
       end;
     $33:
@@ -899,7 +892,7 @@ begin
       end;
     $2b:
       begin// DEC HL
-        setReg_HL(getReg_HL() - 1);
+        setReg_HL(GetRegHL() - 1);
         consumeClockCycles(8);
       end;
     $3b:
@@ -910,11 +903,11 @@ begin
       end;
     $04, $0c, $14, $1c, $24, $2c, $34, $3c:
       begin
-        inc_opcode(opcode);
+        inc_opcode(OpCode);
       end;
     $05, $0d, $15, $1d, $25, $2d, $35, $3d:
       begin
-        dec_opcode(opcode);
+        DecOpCode(OpCode);
       end;
     $07:
       begin// RLCA
@@ -1008,16 +1001,16 @@ begin
       end;
     $e9:
       begin// JP (HL)
-        Reg_PC := getReg_HL();
+        Reg_PC := GetRegHL();
         consumeClockCycles(4);
       end;
     $20, $28, $30, $38:
       begin
-        jrcc_opcode(opcode);
+        JRCC_OpCode(OpCode);
       end;
     $27:
       begin// DAA
-        daa_opcode(opcode);
+        DAA_OpCode(OpCode);
       end;
     $2F:
       begin// CPL
@@ -1045,7 +1038,7 @@ begin
       end;
     $C9:
       begin// RET
-        Reg_PC := popHelper();
+        Reg_PC := PopHelper();
         consumeClockCycles(16);
       end;
     $CD:
@@ -1056,71 +1049,71 @@ begin
         Reg_PC := Reg_PC + 1;
         tmp := tmp shl 8;
         value := value or tmp;
-        pushHelper(Reg_PC);
+        PushHelper(Reg_PC);
         Reg_PC := value;
         consumeClockCycles(24); // CD指令是24周期，原写成12
       end;
     $D9:
       begin// RETI
-        retHelper();
+        RetHelper();
         GBInterrupt.Instance.masterEnable;
         consumeClockCycles(16);
       end;
     $39, $29, $19, $09, $E8:
       begin
-        add16_opcode(opcode);
+        Add16_OpCode(OpCode);
       end;
     $C1, $D1, $E1, $F1:
       begin
-        pop_opcode(opcode);
+        pop_opcode(OpCode);
       end;
     $C5, $D5, $E5, $F5:
       begin
-        push_opcode(opcode);
+        PushOpCode(OpCode);
       end;
     $01, $02, $06, $08, $0a, $0e, $16, $1a, $1e, $21, $22, $26, $2a, $2e, $31, $32, $36, $3a, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e, $4f, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $5a, $5b, $5c, $5d, $5e, $5f, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $6a, $6b, $6c, $6d, $6e, $6f, $70, $71, $72, $73, $74, $75, $77, $78, $79, $7a, $7b, $7c, $7d, $7e, $7f, $f8, $f9, $fa, $3e, $f2, $e0, $e2, $ea, $f0, $11, $12:
       begin
-        load_opcode(opcode);
+        load_opcode(OpCode);
       end;
     $80, $81, $82, $83, $84, $85, $86, $87, $c6:
       begin
-        add_opcode(opcode);
+        Add_OpCode(OpCode);
       end;
     $88, $89, $8a, $8b, $8c, $8d, $8e, $8f, $ce:
       begin
-        adc_opcode(opcode);
+        Adc_OpCode(OpCode);
       end;
     $90, $91, $92, $93, $94, $95, $96, $97, $d6:
       begin
-        sub_opcode(opcode);
+        sub_opcode(OpCode);
       end;
     $98, $99, $9a, $9b, $9c, $9d, $9e, $9f, $de:
       begin
-        sbc_opcode(opcode);
+        SBCOpCode(OpCode);
       end;
     $a0, $a1, $a2, $a3, $a4, $a5, $a6, $a7, $e6:
       begin
-        and_opcode(opcode);
+        and_opcode(OpCode);
       end;
     $a8, $a9, $aa, $ab, $ac, $ad, $ae, $af, $ee:
       begin
-        xor_opcode(opcode);
+        xor_opcode(OpCode);
       end;
     $b0, $b1, $b2, $b3, $b4, $b5, $b6, $b7, $f6:
       begin
-        or_opcode(opcode);
+        or_opcode(OpCode);
       end;
     $b8, $b9, $ba, $bb, $bc, $bd, $be, $bf, $fe:
       begin
-        cp_opcode(opcode);
+        cp_opcode(OpCode);
       end;
     $c0, $c8, $d0, $d8:
       begin
-        retcc_opcode(opcode);
+        RetCCOpCode(OpCode);
       end;
     $c2, $ca, $d2, $da:
       begin
-        jpcc_opcpode(opcode);
+        jpcc_opcpode(OpCode);
       end;
     $C3:
       begin// JMP
@@ -1128,7 +1121,7 @@ begin
       end;
     $c4, $cc, $d4, $dc:
       begin
-        callcc_opcode(opcode);
+        callcc_opcode(OpCode);
       end;
     $d3, $db, $dd, $e3, $e4, $eb, $ec, $ed, $f4, $fc, $fd:
       begin
@@ -1136,51 +1129,51 @@ begin
       end;
     $c7, $cf, $d7, $df, $e7, $ef, $ff, $f7:
       begin
-        rst_opcode(opcode);
+        RSTOpCode(OpCode);
       end;
     $cb00, $cb01, $cb02, $cb03, $cb04, $cb05, $cb06, $cb07:
       begin
-        rlc_opcode(opcode);
+        RLCOpCode(OpCode);
       end;
     $cb08, $cb09, $cb0a, $cb0b, $cb0c, $cb0d, $cb0e, $cb0f:
       begin
-        rrc_opcode(opcode);
+        RRCOpCode(OpCode);
       end;
     $cb10, $cb11, $cb12, $cb13, $cb14, $cb15, $cb16, $cb17:
       begin
-        rl_opcode(opcode);
+        RLOpCode(OpCode);
       end;
     $cb18, $cb19, $cb1a, $cb1b, $cb1c, $cb1d, $cb1e, $cb1f:
       begin
-        rr_opcode(opcode);
+        RROpCode(OpCode);
       end;
     $cb20, $cb21, $cb22, $cb23, $cb24, $cb25, $cb26, $cb27:
       begin
-        sla_opcode(opcode);
+        sla_opcode(OpCode);
       end;
     $cb28, $cb29, $cb2a, $cb2b, $cb2c, $cb2d, $cb2e, $cb2f:
       begin
-        sra_opcode(opcode);
+        sra_opcode(OpCode);
       end;
     $cb30, $cb31, $cb32, $cb33, $cb34, $cb35, $cb36, $cb37:
       begin
-        swap_opcode(opcode);
+        swap_opcode(OpCode);
       end;
     $cb38, $cb39, $cb3a, $cb3b, $cb3c, $cb3d, $cb3e, $cb3f:
       begin
-        srl_opcode(opcode);
+        srl_opcode(OpCode);
       end;
     $cb40, $cb41, $cb42, $cb43, $cb44, $cb45, $cb46, $cb47, $cb48, $cb49, $cb4a, $cb4b, $cb4c, $cb4d, $cb4e, $cb4f, $cb50, $cb51, $cb52, $cb53, $cb54, $cb55, $cb56, $cb57, $cb58, $cb59, $cb5a, $cb5b, $cb5c, $cb5d, $cb5e, $cb5f, $cb60, $cb61, $cb62, $cb63, $cb64, $cb65, $cb66, $cb67, $cb68, $cb69, $cb6a, $cb6b, $cb6c, $cb6d, $cb6e, $cb6f, $cb70, $cb71, $cb72, $cb73, $cb74, $cb75, $cb76, $cb77, $cb78, $cb79, $cb7a, $cb7b, $cb7c, $cb7d, $cb7e, $cb7f:
       begin
-        bit_opcode(opcode);
+        bit_opcode(OpCode);
       end;
     $cb80, $cb81, $cb82, $cb83, $cb84, $cb85, $cb86, $cb87, $cb88, $cb89, $cb8a, $cb8b, $cb8c, $cb8d, $cb8e, $cb8f, $cb90, $cb91, $cb92, $cb93, $cb94, $cb95, $cb96, $cb97, $cb98, $cb99, $cb9a, $cb9b, $cb9c, $cb9d, $cb9e, $cb9f, $cba0, $cba1, $cba2, $cba3, $cba4, $cba5, $cba6, $cba7, $cba8, $cba9, $cbaa, $cbab, $cbac, $cbad, $cbae, $cbaf, $cbb0, $cbb1, $cbb2, $cbb3, $cbb4, $cbb5, $cbb6, $cbb7, $cbb8, $cbb9, $cbba, $cbbb, $cbbc, $cbbd, $cbbe, $cbbf:
       begin
-        res_opcode(opcode);
+        ResOpCode(OpCode);
       end;
     $cbc0, $cbc1, $cbc2, $cbc3, $cbc4, $cbc5, $cbc6, $cbc7, $cbc8, $cbc9, $cbca, $cbcb, $cbcc, $cbcd, $cbce, $cbcf, $cbd0, $cbd1, $cbd2, $cbd3, $cbd4, $cbd5, $cbd6, $cbd7, $cbd8, $cbd9, $cbda, $cbdb, $cbdc, $cbdd, $cbde, $cbdf, $cbe0, $cbe1, $cbe2, $cbe3, $cbe4, $cbe5, $cbe6, $cbe7, $cbe8, $cbe9, $cbea, $cbeb, $cbec, $cbed, $cbee, $cbef, $cbf0, $cbf1, $cbf2, $cbf3, $cbf4, $cbf5, $cbf6, $cbf7, $cbf8, $cbf9, $cbfa, $cbfb, $cbfc, $cbfd, $cbfe, $cbff:
       begin
-        set_opcode(opcode);
+        set_opcode(OpCode);
       end;
 //cur
   else
@@ -1188,11 +1181,11 @@ begin
   end;
 end;
 
-procedure TGBCpu.dec_opcode(opcode: Byte);
+procedure TGBCpu.DecOpCode(OpCode: Byte);
 var
   value, oldvalue, address: Integer;
 begin
-  case opcode of
+  case OpCode of
     $05:
       begin//DEC B
         oldvalue := getReg_B();
@@ -1237,7 +1230,7 @@ begin
       end;
     $35:
       begin//DEC (HL)
-        address := getReg_HL();
+        address := GetRegHL();
         value := _PGBMem^.ReadGBMemory(address);
         oldvalue := value;
         value := value - 1;
@@ -1273,7 +1266,7 @@ begin
   begin
     setFlag_H(False);
   end;
-  if opcode = $35 then
+  if OpCode = $35 then
     consumeClockCycles(12)
   else
     consumeClockCycles(4);
@@ -1331,7 +1324,7 @@ begin
     result := False;
 end;
 
-function TGBCpu.getOpcode: Integer;
+function TGBCpu.GetOpcode: Integer;
 var
   opcode: Integer;
 begin
@@ -1468,7 +1461,7 @@ begin
       end;
     $34:
       begin
-        address := getReg_HL;
+        address := GetRegHL;
         value := _pGBMem^.ReadGBMemory(address) + 1;
         _pGBMem^.WriteGBMemory(address, (value and 255));
 //      consumeClockCycles(12);
@@ -1544,7 +1537,7 @@ begin
   end;
 end;
 
-procedure TGBCpu.jrcc_opcode(opcode: Byte);
+procedure TGBCpu.JRCC_OpCode(opcode: Byte);
 var
   condition: Boolean;
   n: Integer;
@@ -1663,7 +1656,7 @@ begin
       end;
     $7E:
       begin
-        setReg_A(_PGBMem^.ReadGBMemory(getReg_HL));
+        setReg_A(_PGBMem^.ReadGBMemory(GetRegHL));
         consumeClockCycles(8);
       end;
     $40:
@@ -1698,7 +1691,7 @@ begin
       end;
     $46:
       begin
-        setReg_B(_PGBMem^.ReadGBMemory(getReg_HL));
+        setReg_B(_PGBMem^.ReadGBMemory(GetRegHL));
         consumeClockCycles(8);
       end;
     $48:
@@ -1733,7 +1726,7 @@ begin
       end;
     $4E:
       begin
-        setReg_C(_PGBMem^.ReadGBMemory(getReg_HL));
+        setReg_C(_PGBMem^.ReadGBMemory(GetRegHL));
         consumeClockCycles(8);
       end;
     $50:
@@ -1768,7 +1761,7 @@ begin
       end;
     $56:
       begin
-        setReg_D(_PGBMem^.ReadGBMemory(getReg_HL));
+        setReg_D(_PGBMem^.ReadGBMemory(GetRegHL));
         consumeClockCycles(8);
       end;
     $58:
@@ -1803,7 +1796,7 @@ begin
       end;
     $5E:
       begin
-        setReg_E(_PGBMem^.ReadGBMemory(getReg_HL));
+        setReg_E(_PGBMem^.ReadGBMemory(GetRegHL));
         consumeClockCycles(8);
       end;
     $60:
@@ -1838,7 +1831,7 @@ begin
       end;
     $66:
       begin
-        setReg_H(_PGBMem^.ReadGBMemory(getReg_HL));
+        setReg_H(_PGBMem^.ReadGBMemory(GetRegHL));
         consumeClockCycles(8);
       end;
     $68:
@@ -1873,42 +1866,42 @@ begin
       end;
     $6E:
       begin
-        setReg_L(_PGBMem^.ReadGBMemory(getReg_HL));
+        setReg_L(_PGBMem^.ReadGBMemory(GetRegHL));
         consumeClockCycles(8);
       end;
     $70:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_B);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_B);
         consumeClockCycles(8);
       end;
     $71:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_C);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_C);
         consumeClockCycles(8);
       end;
     $72:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_D);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_D);
         consumeClockCycles(8);
       end;
     $73:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_E);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_E);
         consumeClockCycles(8);
       end;
     $74:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_H);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_H);
         consumeClockCycles(8);
       end;
     $75:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_L);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_L);
         consumeClockCycles(8);
       end;
     $36:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, _PGBMem^.ReadGBMemory(Reg_PC));
+        _PGBMem^.WriteGBMemory(GetRegHL, _PGBMem^.ReadGBMemory(Reg_PC));
         Inc(Reg_PC);
         consumeClockCycles(12);
       end;
@@ -1979,7 +1972,7 @@ begin
       end;
     $77:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_A);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_A);
         consumeClockCycles(8);
       end;
     $EA:
@@ -2002,26 +1995,26 @@ begin
       end;
     $3A:
       begin
-        setReg_A(_PGBMem^.ReadGBMemory(getReg_HL));
-        setReg_HL(getReg_HL - 1);
+        setReg_A(_PGBMem^.ReadGBMemory(GetRegHL));
+        setReg_HL(GetRegHL - 1);
         consumeClockCycles(8);
       end;
     $32:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_A);
-        setReg_HL(getReg_HL - 1);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_A);
+        setReg_HL(GetRegHL - 1);
         consumeClockCycles(8);
       end;
     $2A:
       begin
-        setReg_A(_PGBMem^.ReadGBMemory(getReg_HL));
-        setReg_HL(getReg_HL + 1);
+        setReg_A(_PGBMem^.ReadGBMemory(GetRegHL));
+        setReg_HL(GetRegHL + 1);
         consumeClockCycles(8);
       end;
     $22:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, getReg_A);
-        setReg_HL(getReg_HL + 1);
+        _PGBMem^.WriteGBMemory(GetRegHL, getReg_A);
+        setReg_HL(GetRegHL + 1);
         consumeClockCycles(8);
       end;
     $E0:
@@ -2071,7 +2064,7 @@ begin
       end;
     $F9:
       begin
-        Reg_SP := getReg_HL;
+        Reg_SP := GetRegHL;
         consumeClockCycles(8);
       end;
     $F8:
@@ -2183,7 +2176,7 @@ begin
       end;
     $B6:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $F6:
@@ -2207,7 +2200,7 @@ begin
     consumeClockCycles(4);
 end;
 
-function TGBCpu.popHelper: Integer;
+function TGBCpu.PopHelper: Integer;
 var
   low, high: Integer;
 begin
@@ -2224,22 +2217,22 @@ begin
   case opcode of
     $F1:
       begin//POP AF
-        setReg_AF(popHelper);
+        setReg_AF(PopHelper);
         consumeClockCycles(12);
       end;
     $C1:
       begin//POP BC
-        setReg_BC(popHelper);
+        setReg_BC(PopHelper);
         consumeClockCycles(12);
       end;
     $D1:
       begin//POP DE
-        setReg_DE(popHelper);
+        setReg_DE(PopHelper);
         consumeClockCycles(12);
       end;
     $E1:
       begin//POP HL
-        setReg_HL(popHelper);
+        setReg_HL(PopHelper);
         consumeClockCycles(12);
       end;
   end;
@@ -2271,7 +2264,7 @@ begin
       begin
         if _gbInterrupt.isEnabled then
         begin
-          pushHelper(Reg_PC);
+          PushHelper(Reg_PC);
           Reg_PC := _gbInterrupt.handler;
           GBInterrupt.Instance.clearInterruptByIdx(I);
           GBInterrupt.Instance.masterDisable;
@@ -2282,82 +2275,66 @@ begin
   end;
 end;
 
-procedure TGBCpu.pushHelper(value: Integer);
+procedure TGBCpu.PushHelper(Value: Integer);
 begin
   Reg_SP := Reg_SP - 1;
-  _PGBMem^.WriteGBMemory(Reg_SP, (value and $FF00) shr 8);
+  _PGBMem^.WriteGBMemory(Reg_SP, (Value and $FF00) shr 8);
   Reg_SP := Reg_SP - 1;
-  _PGBMem^.WriteGBMemory(Reg_SP, value and $00FF);
+  _PGBMem^.WriteGBMemory(Reg_SP, Value and $00FF);
 end;
 
-procedure TGBCpu.push_opcode(opcode: Integer);
+procedure TGBCpu.PushOpCode(OpCode: Integer);
 begin
-  case opcode of
+  case OpCode of
     $F5:
       begin//PUSH AF
-        pushHelper(getReg_AF);
+        PushHelper(getReg_AF);
         consumeClockCycles(16);
       end;
     $C5:
       begin//PUSH BC
-        pushHelper(getReg_BC);
+        PushHelper(getReg_BC);
         consumeClockCycles(16);
       end;
     $D5:
       begin//PUSH DE
-        pushHelper(getReg_DE);
+        PushHelper(getReg_DE);
         consumeClockCycles(16);
       end;
     $E5:
       begin//PUSH HL
-        pushHelper(getReg_HL);
+        PushHelper(GetRegHL);
         consumeClockCycles(16);
       end;
   end;
 end;
 
-procedure TGBCpu.rrc_opcode(opcode: Word);
+procedure TGBCpu.RRCOpCode(OpCode: Word);
 var
   value, result, oldbit0: Integer;
 begin
-  case opcode of
+  case OpCode of
     $CB0F:
-      begin
-        value := getReg_A;
-      end;
+      value := getReg_A;
     $CB08:
-      begin
-        value := getReg_B;
-      end;
+      value := getReg_B;
     $CB09:
-      begin
-        value := getReg_C;
-      end;
+      value := getReg_C;
     $CB0A:
-      begin
-        value := getReg_D;
-      end;
+      value := getReg_D;
     $CB0B:
-      begin
-        value := getReg_E;
-      end;
+      value := getReg_E;
     $CB0C:
-      begin
-        value := getReg_H;
-      end;
+      value := getReg_H;
     $CB0D:
-      begin
-        value := getReg_L;
-      end;
+      value := getReg_L;
     $CB0E:
-      begin
-        value := _PGBMem^.ReadGBMemory(getReg_HL);
-      end;
+      value := _PGBMem^.ReadGBMemory(GetRegHL);
   end;
   oldbit0 := value and $01;
   value := value shr 1;
   result := value or (oldbit0 shl 7);
-  case opcode of
+  case OpCode of
     $CB0F:
       begin
         setReg_A(result);
@@ -2395,7 +2372,7 @@ begin
       end;
     $CB0E:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, result);
+        _PGBMem^.WriteGBMemory(GetRegHL, result);
 //      consumeClockCycles(16);
       end;
   end;
@@ -2409,13 +2386,13 @@ begin
     setFlag_C(True)
   else
     setFlag_C(False);
-  if (opcode = $CB0E) then
+  if (OpCode = $CB0E) then
     consumeClockCycles(16)
   else
     consumeClockCycles(8);
 end;
 
-procedure TGBCpu.res_opcode(opcode: Word);
+procedure TGBCpu.ResOpCode(opcode: Word);
 var
   value, mask, bitIndex: Integer;
 begin
@@ -2427,45 +2404,35 @@ begin
   cbHelperWrite(opcode, value);
 end;
 
-procedure TGBCpu.retcc_opcode(opcode: Byte);
+procedure TGBCpu.RetCCOpCode(OpCode: Byte);
 var
   condition: Boolean;
 begin
-  case opcode of
+  case OpCode of
     $C0:
-      begin
-        condition := not getFlag_Z;
-      end;
+      condition := not getFlag_Z;
     $C8:
-      begin
-        condition := getFlag_Z;
-      end;
+      condition := getFlag_Z;
     $D0:
-      begin
-        condition := not getFlag_C;
-      end;
+      condition := not getFlag_C;
     $D8:
-      begin
-        condition := getFlag_C;
-      end;
+      condition := getFlag_C;
   end;
   if not condition then
-  begin
-    consumeClockCycles(8);
-  end
+    consumeClockCycles(8)
   else
   begin
-    retHelper();
+    RetHelper();
     consumeClockCycles(20);
   end;
 end;
 
-procedure TGBCpu.retHelper;
+procedure TGBCpu.RetHelper;
 begin
-  Reg_PC := popHelper();
+  Reg_PC := PopHelper;
 end;
 
-procedure TGBCpu.rlc_opcode(opcode: Word);
+procedure TGBCpu.RLCOpCode(opcode: Word);
 var
   value, result: Integer;
   bit7: Boolean;
@@ -2501,7 +2468,7 @@ begin
       end;
     $CB06:
       begin
-        value := _PGBMem^.ReadGBMemory(getReg_HL);
+        value := _PGBMem^.ReadGBMemory(GetRegHL);
       end;
   end;
   // bug fix ,CB系，错一堆了。
@@ -2549,7 +2516,7 @@ begin
       end;
     $CB06:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, result);
+        _PGBMem^.WriteGBMemory(GetRegHL, result);
 //      consumeClockCycles(16);
       end;
   end;
@@ -2566,7 +2533,7 @@ begin
     consumeClockCycles(8);
 end;
 
-procedure TGBCpu.rl_opcode(opcode: Word);
+procedure TGBCpu.RLOpCode(opcode: Word);
 var
   value, result: Integer;
   bit7: Boolean;
@@ -2602,7 +2569,7 @@ begin
       end;
     $CB16:
       begin
-        value := _PGBMem^.ReadGBMemory(getReg_HL);
+        value := _PGBMem^.ReadGBMemory(GetRegHL);
       end;
   end;
   if (value and $80) > 0 then
@@ -2652,7 +2619,7 @@ begin
       end;
     $CB16:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, result);
+        _PGBMem^.WriteGBMemory(GetRegHL, result);
 //      consumeClockCycles(16);
       end;
   end;
@@ -2669,49 +2636,35 @@ begin
     consumeClockCycles(8);
 end;
 
-procedure TGBCpu.rr_opcode(opcode: Word);
+procedure TGBCpu.RROpCode(OpCode: Word);
 var
   value, result: Integer;
 begin
-  case opcode of
+  case OpCode of
     $CB1F:
-      begin
-        value := getReg_A;
-      end;
+      value := getReg_A;
     $CB18:
-      begin
-        value := getReg_B;
-      end;
+      value := getReg_B;
     $CB19:
-      begin
-        value := getReg_C;
-      end;
+      value := getReg_C;
     $CB1A:
-      begin
-        value := getReg_D;
-      end;
+      value := getReg_D;
     $CB1B:
-      begin
-        value := getReg_E;
-      end;
+      value := getReg_E;
     $CB1C:
-      begin
-        value := getReg_H;
-      end;
+      value := getReg_H;
     $CB1D:
-      begin
-        value := getReg_L;
-      end;
+      value := getReg_L;
     $CB1E:
       begin
-        value := _PGBMem^.ReadGBMemory(getReg_HL);
+        value := _PGBMem^.ReadGBMemory(GetRegHL);
       end;
   end;
   if getFlag_C then
     result := (value shr 1) or (1 shl 7)
   else
     result := (value shr 1) or (0 shl 7);
-  case opcode of
+  case OpCode of
     $CB1F:
       begin
         setReg_A(result);
@@ -2749,7 +2702,7 @@ begin
       end;
     $CB1E:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, result);
+        _PGBMem^.WriteGBMemory(GetRegHL, result);
 //      consumeClockCycles(16);
       end;
   end;
@@ -2763,58 +2716,42 @@ begin
     setFlag_Z(False);
   setFlag_N(False);
   setFlag_H(False);
-  if opcode = $CB1E then
+  if OpCode = $CB1E then
     consumeClockCycles(16)
   else
     consumeClockCycles(8);
 end;
 
-procedure TGBCpu.rst_opcode(opcode: Byte);
+procedure TGBCpu.RSTOpCode(Value: Byte);
 begin
-  pushHelper(Reg_PC);
-  case opcode of
+  PushHelper(Reg_PC);
+  case Value of
     $C7:
-      begin
-        Reg_PC := $00;
-      end;
+      Reg_PC := $00;
     $CF:
-      begin
-        Reg_PC := $08;
-      end;
+      Reg_PC := $08;
     $D7:
-      begin
-        Reg_PC := $10;
-      end;
+      Reg_PC := $10;
     $DF:
-      begin
-        Reg_PC := $18;
-      end;
+      Reg_PC := $18;
     $E7:
-      begin
-        Reg_PC := $20;
-      end;
+      Reg_PC := $20;
     $EF:
-      begin
-        Reg_PC := $28;
-      end;
+      Reg_PC := $28;
     $F7:
-      begin
-        Reg_PC := $30;
-      end;
+      Reg_PC := $30;
     $FF:
-      begin
-        Reg_PC := $38;
-      end;
+      Reg_PC := $38;
   end;
   consumeClockCycles(16);
 end;
 
-function TGBCpu.getReg_HL: Word;
+function TGBCpu.GetRegHL: Word;
 begin
   result := Reg_H * $100 + Reg_L;
 end;
 
-procedure TGBCpu.sbc_opcode(opcode: Byte);
+procedure TGBCpu.SBCOpCode(opcode: Byte);
 var
   second, result: Integer;
 begin
@@ -2856,7 +2793,7 @@ begin
       end;
     $9E:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $DE:
@@ -2934,17 +2871,11 @@ begin
 end;
 
 procedure TGBCpu.setReg_AF(val: Word);
-var
-  tmp: Byte;
-begin       // add =
+begin
   if (val > $FFFF) or (val < 0) then
-  begin
     val := val and $FFFF;
-  end;
   Reg_A := val div 256;
-  tmp := val; // 取Word的低4位变成Byte
-  tmp := tmp and $F0; //将低4位变0，F寄存器低4位永远是0
-  Reg_F := tmp;
+  Reg_F := Byte(val) and $F0;
 end;
 
 procedure TGBCpu.setReg_B(val: Byte);
@@ -3000,7 +2931,7 @@ begin
   cbHelperWrite(opcode, value);
 end;
 
-procedure TGBCpu.skipBios;
+procedure TGBCpu.SkipBios;
 begin
   setReg_A($01);
   setReg_B($00);
@@ -3086,7 +3017,7 @@ begin
       end;
     $CB26:
       begin
-        value := _PGBMem^.ReadGBMemory(getReg_HL);
+        value := _PGBMem^.ReadGBMemory(GetRegHL);
       end;
   end;
   if ((value and $80) shr 7) = 1 then
@@ -3133,7 +3064,7 @@ begin
       end;
     $CB26:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, result);
+        _PGBMem^.WriteGBMemory(GetRegHL, result);
 //      consumeClockCycles(16);
       end;
   end;
@@ -3186,7 +3117,7 @@ begin
       end;
     $CB2E:
       begin
-        value := _PGBMem^.ReadGBMemory(getReg_HL);
+        value := _PGBMem^.ReadGBMemory(GetRegHL);
       end;
   end;
   // bug fix again
@@ -3233,7 +3164,7 @@ begin
       end;
     $CB2E:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, result);
+        _PGBMem^.WriteGBMemory(GetRegHL, result);
 //      consumeClockCycles(16);
       end;
   end;
@@ -3286,7 +3217,7 @@ begin
       end;
     $CB3E:
       begin
-        value := _PGBMem^.ReadGBMemory(getReg_HL);
+        value := _PGBMem^.ReadGBMemory(GetRegHL);
       end;
   end;
   if value and $1 <> 0 then
@@ -3332,7 +3263,7 @@ begin
       end;
     $CB3E:
       begin
-        _PGBMem^.WriteGBMemory(getReg_HL, result);
+        _PGBMem^.WriteGBMemory(GetRegHL, result);
 //      consumeClockCycles(16);
       end;
   end;
@@ -3364,7 +3295,7 @@ begin
 //        _instr_count := 6;
     if _icycle_count = 75345 then
       _icycle_count := 75345;
-    opcode := getOpcode;
+    opcode := GetOpcode;
     _debug_opcode := opcode;
 //      if (_instr_count >=0) and (_instr_count < 300000) then
 //      begin
@@ -3395,7 +3326,7 @@ begin
 //          _debug_log_list.Append('INT 3:isEnabled=False');
 //      end;
 
-    deCode(opcode);
+    Decode(opcode);
     processEi(opcode);
   end
   else
@@ -3446,7 +3377,7 @@ begin
       end;
     $96:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $D6:
@@ -3542,8 +3473,8 @@ begin
       end;
     $CB36:
       begin
-        value := swapHelper(_PGBMem^.ReadGBMemory(getReg_HL));
-        _PGBMem^.WriteGBMemory(getReg_HL, value);
+        value := swapHelper(_PGBMem^.ReadGBMemory(GetRegHL));
+        _PGBMem^.WriteGBMemory(GetRegHL, value);
 //      consumeClockCycles(16);
       end;
   end;
@@ -3602,7 +3533,7 @@ begin
       end;
     $AE:
       begin
-        second := _PGBMem^.ReadGBMemory(getReg_HL);
+        second := _PGBMem^.ReadGBMemory(GetRegHL);
 //      consumeClockCycles(8);
       end;
     $EE:
