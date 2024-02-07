@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E5C8A10E-AC85-4E02-B61C-8D3CD5B5E587}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="GameBoyEmuFMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\#Fork\DelphiGBEmu\Project1.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="GameBoyEmuFMX">
+        <MSBuild Projects="GameBoyEmuFMX.dproj"/>
+    </Target>
+    <Target Name="GameBoyEmuFMX:Clean">
+        <MSBuild Projects="GameBoyEmuFMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GameBoyEmuFMX:Make">
+        <MSBuild Projects="GameBoyEmuFMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Project1">
+        <MSBuild Projects="..\#Fork\DelphiGBEmu\Project1.dproj"/>
+    </Target>
+    <Target Name="Project1:Clean">
+        <MSBuild Projects="..\#Fork\DelphiGBEmu\Project1.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Project1:Make">
+        <MSBuild Projects="..\#Fork\DelphiGBEmu\Project1.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="GameBoyEmuFMX;Project1"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="GameBoyEmuFMX:Clean;Project1:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="GameBoyEmuFMX:Make;Project1:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

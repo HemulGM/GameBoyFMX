@@ -1,0 +1,448 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  Caption = 'Form5'
+  ClientHeight = 700
+  ClientWidth = 450
+  Padding.Left = 20.000000000000000000
+  Padding.Top = 20.000000000000000000
+  Padding.Right = 20.000000000000000000
+  Padding.Bottom = 20.000000000000000000
+  Transparency = True
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  DesignerMasterStyle = 0
+  object TimerFPS: TTimer
+    Enabled = False
+    OnTimer = TimerFPSTimer
+    Left = 312
+    Top = 104
+  end
+  object LayoutShadow: TLayout
+    Align = Client
+    Size.Width = 410.000000000000000000
+    Size.Height = 660.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object LayoutClient: TLayout
+      Align = Client
+      HitTest = True
+      Size.Width = 410.000000000000000000
+      Size.Height = 660.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      OnMouseDown = LayoutClientMouseDown
+      object LayoutBottom: TLayout
+        Align = Bottom
+        Position.Y = 560.000000000000000000
+        Size.Width = 410.000000000000000000
+        Size.Height = 100.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object Rectangle1: TRectangle
+          Align = Client
+          Corners = [BottomLeft]
+          Fill.Color = xFFC3C0BD
+          HitTest = False
+          Sides = [Left]
+          Size.Width = 258.000000000000000000
+          Size.Height = 100.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFAFADAB
+          XRadius = 20.000000000000000000
+          YRadius = 20.000000000000000000
+        end
+        object Rectangle2: TRectangle
+          Align = Right
+          Corners = [BottomRight]
+          Fill.Color = xFFC3C0BD
+          HitTest = False
+          Position.X = 258.000000000000000000
+          Sides = [Right]
+          Size.Width = 152.000000000000000000
+          Size.Height = 100.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFAFADAB
+          XRadius = 50.000000000000000000
+          YRadius = 50.000000000000000000
+        end
+      end
+      object RectangleBG: TRectangle
+        Align = Client
+        Corners = [TopLeft, TopRight]
+        Fill.Color = xFFC3C0BD
+        HitTest = False
+        Sides = [Top, Left, Right]
+        Size.Width = 410.000000000000000000
+        Size.Height = 560.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Color = xFFAFADAB
+        XRadius = 20.000000000000000000
+        YRadius = 20.000000000000000000
+        object LayoutScreen: TLayout
+          Align = Top
+          Size.Width = 410.000000000000000000
+          Size.Height = 400.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          object LayoutScreenLayer: TLayout
+            Align = Center
+            Size.Width = 320.000000000000000000
+            Size.Height = 288.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            object RectangleScreenFrame: TRectangle
+              Align = Client
+              Fill.Color = xFF8A868C
+              HitTest = False
+              Margins.Left = -20.000000000000000000
+              Margins.Top = -20.000000000000000000
+              Margins.Right = -20.000000000000000000
+              Margins.Bottom = -20.000000000000000000
+              Size.Width = 360.000000000000000000
+              Size.Height = 328.000000000000000000
+              Size.PlatformDefault = False
+              Stroke.Kind = None
+              XRadius = 10.000000000000000000
+              YRadius = 10.000000000000000000
+            end
+            object RectangleScreenBlack: TRectangle
+              Align = Client
+              Fill.Color = xFF95AE3A
+              HitTest = False
+              Size.Width = 320.000000000000000000
+              Size.Height = 288.000000000000000000
+              Size.PlatformDefault = False
+              Stroke.Kind = None
+            end
+            object PaintBoxScreen: TPaintBox
+              Align = Client
+              HitTest = False
+              Size.Width = 320.000000000000000000
+              Size.Height = 288.000000000000000000
+              Size.PlatformDefault = False
+              OnPaint = PaintBoxScreenPaint
+              object Rectangle3: TRectangle
+                Align = Client
+                Fill.Kind = None
+                HitTest = False
+                Margins.Left = -1.000000000000000000
+                Margins.Top = -1.000000000000000000
+                Margins.Right = -1.000000000000000000
+                Margins.Bottom = -1.000000000000000000
+                Size.Width = 322.000000000000000000
+                Size.Height = 290.000000000000000000
+                Size.PlatformDefault = False
+                Stroke.Color = x3C000000
+                Stroke.Thickness = 2.000000000000000000
+                XRadius = 2.000000000000000000
+                YRadius = 2.000000000000000000
+              end
+            end
+          end
+        end
+        object Layout1: TLayout
+          Align = Top
+          Padding.Left = 30.000000000000000000
+          Margins.Top = -35.000000000000000000
+          Position.Y = 365.000000000000000000
+          Size.Width = 410.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          object Label1: TLabel
+            Align = Left
+            AutoSize = True
+            StyledSettings = []
+            Margins.Right = 4.000000000000000000
+            Position.X = 30.000000000000000000
+            Size.Width = 66.000000000000000000
+            Size.Height = 30.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Roboto'
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = xFF3D3384
+            TextSettings.VertAlign = Trailing
+            TextSettings.WordWrap = False
+            Text = 'Nintendo'
+            TabOrder = 2
+          end
+          object Label2: TLabel
+            Align = Left
+            AutoSize = True
+            StyledSettings = []
+            Margins.Right = 4.000000000000000000
+            Position.X = 100.000000000000000000
+            Size.Width = 99.000000000000000000
+            Size.Height = 30.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Roboto'
+            TextSettings.Font.Size = 20.000000000000000000
+            TextSettings.FontColor = xFF3D3384
+            TextSettings.VertAlign = Trailing
+            TextSettings.WordWrap = False
+            Text = 'GAME BOY'
+            TabOrder = 1
+          end
+          object Label3: TLabel
+            Align = Left
+            AutoSize = True
+            StyledSettings = [Style]
+            Margins.Right = 4.000000000000000000
+            Position.X = 203.000000000000000000
+            Size.Width = 12.000000000000000000
+            Size.Height = 30.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Roboto'
+            TextSettings.Font.Size = 8.000000000000000000
+            TextSettings.FontColor = xFF3D3384
+            TextSettings.VertAlign = Trailing
+            TextSettings.WordWrap = False
+            Text = 'TM'
+            TabOrder = 0
+          end
+        end
+      end
+      object InnerGlowEffect: TInnerGlowEffect
+        Softness = 0.400000005960464500
+        GlowColor = claBlack
+        Opacity = 0.300000011920929000
+        Enabled = False
+      end
+      object LayoutOverlay: TLayout
+        Align = Contents
+        Size.Width = 410.000000000000000000
+        Size.Height = 660.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object LabelFPS: TLabel
+          Position.X = 32.000000000000000000
+          Position.Y = 8.000000000000000000
+          Text = 'LabelFPS'
+          TabOrder = 2
+        end
+        object Layout2: TLayout
+          Position.X = 44.000000000000000000
+          Position.Y = 454.000000000000000000
+          Size.Width = 90.000000000000000000
+          Size.Height = 90.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          object Rectangle4: TRectangle
+            Align = VertCenter
+            Fill.Color = xFF1A1A1A
+            HitTest = False
+            Position.Y = 30.000000000000000000
+            Size.Width = 90.000000000000000000
+            Size.Height = 30.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Kind = None
+            XRadius = 4.000000000000000000
+            YRadius = 4.000000000000000000
+          end
+          object Rectangle5: TRectangle
+            Align = HorzCenter
+            Fill.Color = xFF1A1A1A
+            HitTest = False
+            Position.X = 30.000000000000000000
+            Size.Width = 30.000000000000000000
+            Size.Height = 90.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Kind = None
+            XRadius = 4.000000000000000000
+            YRadius = 4.000000000000000000
+            object Circle1: TCircle
+              Align = Center
+              Fill.Color = xFF2C2C2C
+              HitTest = False
+              Size.Width = 20.000000000000000000
+              Size.Height = 20.000000000000000000
+              Size.PlatformDefault = False
+              Stroke.Color = xFF1A1A1A
+            end
+          end
+        end
+        object Layout3: TLayout
+          Position.X = 258.000000000000000000
+          Position.Y = 454.000000000000000000
+          Size.Width = 127.000000000000000000
+          Size.Height = 90.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 4
+          object Circle2: TCircle
+            Fill.Color = xFF860E48
+            HitTest = False
+            Position.X = 8.000000000000000000
+            Position.Y = 40.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Color = xFF620A35
+          end
+          object Circle3: TCircle
+            Fill.Color = xFF860E48
+            HitTest = False
+            Position.X = 77.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Color = xFF620A35
+          end
+          object Layout4: TLayout
+            Position.X = 36.000000000000000000
+            Position.Y = 55.000000000000000000
+            RotationAngle = -30.000000000000000000
+            Size.Width = 116.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            object Label4: TLabel
+              StyledSettings = []
+              Position.X = 8.000000000000000000
+              Position.Y = 16.000000000000000000
+              Size.Width = 17.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.Font.Family = 'Consolas'
+              TextSettings.Font.Size = 17.000000000000000000
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
+              TextSettings.FontColor = xFF3D3384
+              Text = 'B'
+              TabOrder = 1
+            end
+            object Label5: TLabel
+              StyledSettings = []
+              Position.X = 88.000000000000000000
+              Position.Y = 17.000000000000000000
+              Size.Width = 17.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.Font.Family = 'Consolas'
+              TextSettings.Font.Size = 17.000000000000000000
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
+              TextSettings.FontColor = xFF3D3384
+              Text = 'A'
+              TabOrder = 0
+            end
+          end
+        end
+        object Layout5: TLayout
+          Position.X = 132.000000000000000000
+          Position.Y = 568.000000000000000000
+          Size.Width = 137.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 5
+          object Rectangle6: TRectangle
+            Fill.Color = xFF77767C
+            HitTest = False
+            Position.X = 8.000000000000000000
+            Position.Y = 13.000000000000000000
+            RotationAngle = -30.000000000000000000
+            Size.Width = 55.000000000000000000
+            Size.Height = 14.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Color = xFF5A5A5C
+            XRadius = 7.000000000000000000
+            YRadius = 7.000000000000000000
+            object Label6: TLabel
+              Align = Center
+              AutoSize = True
+              StyledSettings = [Size]
+              Margins.Top = 35.000000000000000000
+              Size.Width = 42.000000000000000000
+              Size.Height = 15.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.Font.Family = 'Roboto'
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
+              TextSettings.FontColor = xFF3D3384
+              TextSettings.WordWrap = False
+              Text = 'SELECT'
+              TabOrder = 0
+            end
+          end
+          object Rectangle7: TRectangle
+            Fill.Color = xFF77767C
+            HitTest = False
+            Position.X = 74.000000000000000000
+            Position.Y = 13.000000000000000000
+            RotationAngle = -30.000000000000000000
+            Size.Width = 55.000000000000000000
+            Size.Height = 14.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Color = xFF5A5A5C
+            XRadius = 7.000000000000000000
+            YRadius = 7.000000000000000000
+            object Label7: TLabel
+              Align = Center
+              AutoSize = True
+              StyledSettings = [Size]
+              Margins.Top = 35.000000000000000000
+              Size.Width = 36.000000000000000000
+              Size.Height = 15.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.Font.Family = 'Roboto'
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
+              TextSettings.FontColor = xFF3D3384
+              TextSettings.WordWrap = False
+              Text = 'START'
+              TabOrder = 0
+            end
+          end
+        end
+        object Layout6: TLayout
+          Align = Bottom
+          Position.Y = 622.000000000000000000
+          Size.Width = 410.000000000000000000
+          Size.Height = 38.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 6
+          object RectangleLoad: TRectangle
+            Align = Left
+            Fill.Color = xFF77767C
+            Opacity = 0.699999988079071000
+            Margins.Left = 10.000000000000000000
+            Margins.Top = 6.000000000000000000
+            Margins.Bottom = 6.000000000000000000
+            Position.X = 10.000000000000000000
+            Position.Y = 6.000000000000000000
+            Size.Width = 89.000000000000000000
+            Size.Height = 26.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Color = xFF5A5A5C
+            XRadius = 4.000000000000000000
+            YRadius = 4.000000000000000000
+            OnClick = ButtonLoadClick
+            object Label8: TLabel
+              Align = Center
+              AutoSize = True
+              StyledSettings = [Size]
+              Size.Width = 66.000000000000000000
+              Size.Height = 15.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.Font.Family = 'Roboto'
+              TextSettings.Font.StyleExt = {00070000000000000004000000}
+              TextSettings.FontColor = xFFC3C0BD
+              TextSettings.WordWrap = False
+              Text = 'LOAD GAME'
+              TabOrder = 0
+            end
+          end
+        end
+      end
+    end
+    object ShadowEffect: TShadowEffect
+      Distance = 0.000099999997473788
+      Direction = 45.000000000000000000
+      Softness = 0.400000005960464500
+      Opacity = 0.400000005960464500
+      ShadowColor = claBlack
+      Enabled = False
+    end
+  end
+end
